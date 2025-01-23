@@ -179,11 +179,22 @@ if (isset($_GET['logout']) || (isset($student['email']) && $student['email'] != 
                 <p>This Presentation/lab will provide code to demonstrate how to use CasC to maintain all aspects of AAP. The provided code will be a starting point, and will guide the user through how to utilize the code, and make it their own. This session will cover configuring controller, private automation hub, execution environments, and custom collections as well as the creation of workflows without the GUI as an example to follow along. These principles will help to prevent drift in configuration, allow changes to require approval before implementation, and help to maintain both a development and prod deployment.</p>
                 <div class="row">
                     <div class="col-sm-4">
-                        <a target=_blank href="https://sean-m-sullivan.github.io/ansiblefest2022_configuration_as_code/">Ansible Fest 2022 Configuration as Code Workshop</a>
+                        <a target=_blank href="https://aap2.demoredhat.com/exercises/ansible_config_as_code/">Configuration as Code Workshop</a>
                     </div>
                     <div class="col-sm-4">
-                        <a target=_blank href="https://github.com/sean-m-sullivan/ansiblefest2022_configuration_as_code/">Workshop Git Repo</a>
+                        <a target=_blank href="https://github.com/ansible/workshops/tree/devel/exercises/ansible_config_as_code/">Workshop Git Repo</a>
                   </div>
+                </div>
+                {% elif workshop_type == 'ripu' %}
+                <h2>Ansible Automation Platform + RIPU</h2>
+                <p>This workshop will introduce a comprehensive approach to automate in-place upgrades for Red Hat Enterprise Linux (RHEL). The solution uses Ansible Automation to enable upgrades to be executed at enterprise scale across a large estate of RHEL hosts. The workshop demonstrates how to use an example of this approach to perform upgrades from RHEL7 to RHEL8 and from RHEL8 to RHEL9. You will also learn about how this solution can be customized to meet the special requirements of your enterprise environment.</p>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <a target=_blank href="https://aap2.demoredhat.com/exercises/ansible_ripu">Ansible RIPU Exercises</a>
+                    </div>
+                    <div class="col-sm-4">
+                        <a target=_blank href="https://aap2.demoredhat.com/decks/ansible_ripu.pdf">Ansible Technical Deck</a>
+                    </div>
                 </div>
                 {% elif workshop_type == 'smart_mgmt' %}
                 <h2>Ansible Automation Platform + Satellite</h2>
@@ -201,6 +212,25 @@ if (isset($_GET['logout']) || (isset($student['email']) && $student['email'] != 
                     </div>
                     <div class="col-sm-4">
                         <a target=_blank href="https://aap2.demoredhat.com/decks/ansible_smart_mgmt.pdf">Automate Smart Management Deck</a>
+                  </div>
+                </div>
+                {% elif workshop_type == 'auto_satellite' %}
+                <h2>Ansible Automation Platform + Satellite</h2>
+                <p>The Automate Satellite Workshop is a half-day, hands-on workshop covering Red Hat Ansible Automation Platform, Red Hat Satellite, Red Hat Enterprise Linux and CentOS Linux. Attendees will learn how to use Ansible to automate configuration of Red Hat Ansible Automation Platform controller and Red Hat Satellite, and acquire the skills needed to implement Ansible Automation at their organizations. This workshop is comprised of 4 areas of focus:</p>
+                <ul>
+                  <li>How to implement Infrastructure as Code automation with Red Hat solutions</li>
+                  <li>Compliance (OpenSCAP Scanning) and Vulnerability Management</li>
+                  <li>OS Patch/Package Management at scale</li>
+                  <li>CentOS to RHEL conversion at scale</li>
+                  <li>Vulnerability Management with Insights</li>
+                </ul>
+                <br>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <a target=_blank href="https://aap2.demoredhat.com/exercises/ansible_auto_satellite">Automate Satellite Exercises</a>
+                    </div>
+                    <div class="col-sm-4">
+                        <a target=_blank href="https://aap2.demoredhat.com/decks/ansible_auto_satellite.pdf">Automate Satellite Deck</a>
                   </div>
                 </div>
                 {% endif %}
@@ -256,11 +286,11 @@ if (isset($student['id'])) {
     <div class="footer-linkContainer">
       <a href="https://www.redhat.com/en/about/privacy-policy" class="footer-link">Privacy statement</a>
       <span class="footer-linkSpacer">|</span>
+      <a href="https://www.redhat.com/en/about/terms-use" class="footer-link">Terms of use</a>
+      <span class="footer-linkSpacer">|</span>
       <a href="https://www.ansible.com/security?hsLang=en-us" class="footer-link">Security disclosure</a>
       <span class="footer-linkSpacer">|</span>
       <a href="https://www.redhat.com/en/about/all-policies-guidelines" class="footer-link">All policies and guidelines</a>
-      <span class="footer-linkSpacer">|</span>
-      <a href="https://github.com/ansible/workshops" class="footer-link">Workshop Version {{ workshop_version }}</a>
     </div>
   </div>
 </footer>
@@ -379,6 +409,58 @@ function display_student($student) {
     <tr>
       <td>username:</td>
       <td><code>{% if workshop_type == "windows" %}student' . $student['id'] . '{% else %}admin{% endif %}</code></td>
+    </tr>
+    <tr>
+      <td>password:</td>
+      <td><code>{{admin_password}}</code></td>
+    </tr>
+  </table>
+  {% endif %}
+  {% if workshop_type == "auto_satellite" %}
+  <div id="section_title">Red Hat Satellite </div>
+  To login to the Satellite WebUI use the following credentials:<br>
+  <table>
+  {% if dns_type != 'none' %}
+    <tr>
+  <td>WebUI link:</td>
+  <td><a target=_blank href="https://student' . $student['id'] . '-sat.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}">https://student' . $student['id'] . '-sat.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}</a></td>
+    </tr>
+  {% endif %}
+  {% if dns_type == 'none' %}
+    <tr>
+  <td>UI link:
+  <td><a target=_blank href="https://' . $student['ip'] . '">https://' . $student['ip'] . '</a></td>
+    </tr>
+  {% endif %}
+    <tr>
+      <td>username:</td>
+      <td><code>{% if workshop_type == "windows" %}student' . $student['id'] . '{% else %}admin{% endif %}</code></td>
+    </tr>
+    <tr>
+      <td>password:</td>
+      <td><code>{{admin_password}}</code></td>
+    </tr>
+  </table>
+  {% endif %}
+  {% if workshop_type == "ripu" %}
+  <div id="section_title">RHEL Web Console</div>
+  To login to the RHEL web console on the AAP2 controller use the following credentials:<br>
+  <table>
+  {% if dns_type != 'none' %}
+    <tr>
+  <td>WebUI link:</td>
+  <td><a target=_blank href="https://student' . $student['id'] . '.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}:9090">https://student' . $student['id'] . '.{{ ec2_name_prefix }}.{{ workshop_dns_zone }}:9090</a></td>
+    </tr>
+  {% endif %}
+  {% if dns_type == 'none' %}
+    <tr>
+  <td>UI link:
+  <td><a target=_blank href="https://' . $student['ip'] . ':9090">https://' . $student['ip'] . ':9090</a></td>
+    </tr>
+  {% endif %}
+    <tr>
+      <td>username:</td>
+      <td><code>student</code></td>
     </tr>
     <tr>
       <td>password:</td>

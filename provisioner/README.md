@@ -12,33 +12,37 @@ The `github.com/ansible/workshops` contains an Ansible Playbook `provision_lab.y
 | Ansible Windows Automation  | `workshop_type: windows`    |
 | Ansible Demo Mode  | `workshop_type: demo`    |
 | Smart Management Workshop | `workshop_type: smart_mgmt` |
+| Automated Satellite Workshop | `workshop_type: auto_satellite` |
 
 ## Table Of Contents
 
 <!-- TOC titleSize:2 tabSpaces:2 depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 skip:0 title:1 charForUnorderedList:* -->
 ## Table of Contents
-* [Ansible Automation Workshop Provisioner](#ansible-automation-workshop-provisioner)
-  * [Table Of Contents](#table-of-contents)
-  * [Requirements](#requirements)
-  * [Lab Setup](#lab-setup)
-    * [One Time Setup](#one-time-setup)
-  * [Ansible-Navigator](#ansible-navigator)
-    * [1. AWS Creds for Execution Environments](#1-aws-creds-for-execution-environments)
-    * [2. Running Ansible-Navigator from the project root](#2-running-ansible-navigator-from-the-project-root)
-    * [Setup (per workshop)](#setup-per-workshop)
-    * [Automation controller license](#automation-controller-license)
-    * [Additional examples](#additional-examples)
-    * [Accessing student documentation and slides](#accessing-student-documentation-and-slides)
-    * [Accessing instructor inventory](#accessing-instructor-inventory)
-    * [DNS](#dns)
-    * [Smart Management](#smart-management)
-    * [devcontainer(optional)](#devcontainer)
-  * [Developer Mode and understanding collections](#developer-mode-and-understanding-collections)
-  * [Lab Teardown](#lab-teardown)
-  * [Demos](#demos)
-  * [FAQ](#faq)
-  * [More info on what is happening](#more-info-on-what-is-happening)
-* [Getting Help](#getting-help)
+- [Ansible Automation Workshop Provisioner](#ansible-automation-workshop-provisioner)
+  - [Table Of Contents](#table-of-contents)
+  - [Table of Contents](#table-of-contents-1)
+  - [Requirements](#requirements)
+  - [Lab Setup](#lab-setup)
+    - [One Time Setup](#one-time-setup)
+  - [Ansible-Navigator](#ansible-navigator)
+    - [1. AWS Creds for Execution Environments](#1-aws-creds-for-execution-environments)
+    - [2. Running Ansible-Navigator from the project root](#2-running-ansible-navigator-from-the-project-root)
+    - [Setup (per workshop)](#setup-per-workshop)
+    - [Automation controller license](#automation-controller-license)
+    - [Automating the download of aap.tar.gz](#automating-the-download-of-aaptargz)
+    - [Additional examples](#additional-examples)
+    - [Accessing student documentation and slides](#accessing-student-documentation-and-slides)
+    - [Accessing instructor inventory](#accessing-instructor-inventory)
+    - [DNS](#dns)
+    - [Smart Management](#smart-management)
+    - [Automated Satellite](#automated-satellite)
+    - [devcontainer](#devcontainer)
+  - [Developer Mode and understanding collections](#developer-mode-and-understanding-collections)
+  - [Lab Teardown](#lab-teardown)
+  - [Demos](#demos)
+  - [FAQ](#faq)
+  - [More info on what is happening](#more-info-on-what-is-happening)
+- [Getting Help](#getting-help)
 <!-- /TOC -->
 
 ## Requirements
@@ -152,6 +156,10 @@ ee_images:
 # "Default execution environment" for controller
 ee_default_image: "{{ ee_registry_name }}/ee-supported-rhel8:latest"
 
+# By default pre_build is set to true, this allows people with access to specific AMIs 
+# built by the Red Hat Ansible Team to be shared with AWS organizations/accounts to speed up
+# provisioning and reduce errors
+pre_build: false
 
 ```
 ### Automation controller license
@@ -229,7 +237,8 @@ For more extra_vars examples, look at the following:
 * [sample-vars-rhel-90.yml](sample_workshops/sample-vars-tower-auto.yml) - example for Tower installation and licensing
 * [sample-vars-rhel-90.yml](sample_workshops/sample-vars-rhel-90.yml) - example for `rhel_90` workshop, meant to be taught in 90 minutes
 * [sample-vars-demo.yml](sample_workshops/sample-vars-demo.yml) - example for `demo` mode, aggregate of all workshop topologies
-* [sameple-vars-smart_mgmt.yml](sample_workshops/sample-vars-smart_mgmt.yml) - example for `smart_mgmt` workshop. [Read Notes](#smart-management)
+* [sample-vars-smart_mgmt.yml](sample_workshops/sample-vars-smart_mgmt.yml) - example for `smart_mgmt` workshop. [Read Notes](#smart-management)
+* [sample-vars-auto_satellite.yml](sample_workshops/sample-vars-auto_satellite.yml) - example for `auto_satellite` workshop. [Read Notes](#automated-satellite)
 
 * Run the playbook:
 
@@ -275,6 +284,11 @@ The Smart Management Lab relies on a prebuilt AMI for Red Hat Satellite Server. 
 
 The Smart Management Lab also requires AWS DNS to be enabled. See [sample vars](./sample_workshops/sample-vars-smart_mgmt.yml) for required configuration.
 
+### Automated Satellite
+
+The Automated Satellite Lab relies on a prebuilt AMI for Red Hat Satellite Server. An example for building this AMI can be found [here](https://github.com/heatmiser/packer-ansible-ec2/tree/satellite-6.12).
+
+The Automated Satellite Lab also requires AWS DNS to be enabled. See [sample vars](./sample_workshops/sample-vars-auto_satellite.yml) for required configuration.
 ### devcontainer
 
 For convenience, a devcontainer has been configured for use within this project. This setup allows workshop developers to run the workspace along with provisioner within a Docker container. The devcontainer has support for docker-in-docker so that `ansible-navigator` can run against the workshop execution environment to provision workshops. 

@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="{{ site.lang | default: "en-US" }}">
-  <head>
+    <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LJWQBHM62Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-LJWQBHM62Z');
+  </script>    
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
@@ -47,6 +56,9 @@
           <a class="header-link" href="{{ '/exercises/ansible_windows/' | relative_url }}">
             Windows
           </a>
+          <a class="header-link" href="{{ '/exercises/ansible_config_as_code/' | relative_url }}">
+            Config as Code
+          </a>          
           <a class="header-link" href="https://github.com/ansible/workshops/issues/new/choose">
             Open an Issue
           </a>
@@ -70,6 +82,8 @@
           <p class="footer-copyright">Copyright © 2022 Red Hat, Inc.</p>
           <div class="footer-linkContainer">
             <a href="https://www.redhat.com/en/about/privacy-policy" class="footer-link">Privacy statement</a>
+            <span class="footer-linkSpacer">|</span>
+            <a href="https://www.redhat.com/en/about/terms-use" class="footer-link">Terms of use</a>
             <span class="footer-linkSpacer">|</span>
             <a href="https://www.ansible.com/security?hsLang=en-us" class="footer-link">Security disclosure</a>
             <span class="footer-linkSpacer">|</span>

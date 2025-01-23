@@ -1,36 +1,29 @@
-# Atelier - Exécution de commandes Ad-hoc
+# Exercice d'Atelier - Les Fondamentaux d'Ansible
 
-**Lisez ceci dans d'autres langues**:
-<br>![uk](../../../images/uk.png) [English](README.md),  ![japan](../../../images/japan.png)[日本語](README.ja.md), ![brazil](../../../images/brazil.png) [Portugues do Brasil](README.pt-br.md), ![france](../../../images/fr.png) [Française](README.fr.md),![Español](../../../images/col.png) [Español](README.es.md).
+**Lisez ceci dans d'autres langues** :
+<br>![uk](../../../images/uk.png) [Anglais](README.md), ![japan](../../../images/japan.png) [日本語](README.ja.md), ![brazil](../../../images/brazil.png) [Portugais du Brésil](README.pt-br.md), ![france](../../../images/fr.png) [Français](README.fr.md), ![Español](../../../images/col.png) [Espagnol](README.es.md).
 
+## Table des Matières <!-- omettre dans toc -->
 
-## Table des matières
+- [Objectif](#objectif)
+- [Guide](#guide)
+  - [Les Bases du Fichier d'Inventaire](#les-bases-du-fichier-dinventaire)
+  - [Découverte de Modules](#découverte-de-modules)
+  - [Accès à la Documentation des Modules](#accès-à-la-documentation-des-modules)
 
-* [Objectif](#objectif)
-* [Guide](#guide)
-* [Étape 1 - Travailler avec votre inventaire](#Étape-1---travailler-avec-votre-inventaire)
-* [Étape 2 - Les fichiers de configuration Ansible](#Étape-2---les-fichiers-de-configuration-ansible)
-* [Étape 3 - Ping d'un hôte](#Étape-3---ping-d-un-hôte)
-* [Étape 4 - Liste des modules et obtention d'aide](#Étape-4---liste-des-modules-et-obtention-d-aide)
-* [Étape 5 - Utilissation du module commande](#Étape-5---utilisation-du-module-commande)
-* [Étape 6 - Le module de copie et les autorisations](#Étape-6---le-module-de-copie-et-les-autorisations)
-* [Défi: Les modules](#défi-les-modules)
+## Objectif
 
-# Objectif
+Dans cet exercice, nous allons explorer le dernier utilitaire de ligne de commande d'Ansible `ansible-navigator` pour apprendre à travailler avec des fichiers d'inventaire et la liste des modules lorsqu'une assistance est nécessaire. L'objectif est de vous familiariser avec le fonctionnement d'`ansible-navigator` et comment il peut être utilisé pour enrichir votre expérience avec Ansible.
 
-Pour notre premier exercice, nous allons exécuter quelques commandes Ad-hoc pour vous aider à comprendre comment fonctionne Ansible. Les commandes Ad-Hoc Ansible vous permettent d'effectuer des tâches sur des nœuds distants sans avoir à écrire un playbook. Ils sont très utiles lorsque vous devez simplement faire une ou deux choses rapidement et souvent, sur de nombreux nœuds distants.
+## Guide
 
-Cet exercice couvrira
-- Localisation et compréhension du fichier de configuration Ansible (`ansible.cfg`)
-- Localisation et compréhension d'un fichier d'inventaire au format "ini"
-- Exécution de commandes ad hoc
+### Les Bases du Fichier d'Inventaire
 
-# Guide
+Un fichier d'inventaire est un fichier texte qui spécifie les nœuds qui seront gérés par la machine de contrôle. Les nœuds à gérer peuvent inclure une liste de noms d'hôtes ou d'adresses IP de ces nœuds. Le fichier d'inventaire permet d'organiser les nœuds en groupes en déclarant un nom de groupe d'hôtes entre crochets ([]).
 
-## Étape 1 - Travailler avec votre inventaire
+### Explorer l'Inventaire
 
-Pour utiliser Ansible, vous devez fournir un fichier d'inventaire qui définit une liste d'hôtes à gérer. Dans cet atelier, l'inventaire est fourni par votre instructeur. L'inventaire est un fichier au format ini répertoriant vos hôtes, trié en groupes, fournissant en outre certaines variables.
-Par exemple:
+Pour utiliser la commande `ansible-navigator` pour la gestion des hôtes, vous devez fournir un fichier d'inventaire qui définit une liste d'hôtes à gérer depuis le nœud de contrôle. Dans ce laboratoire, l'inventaire est fourni par votre instructeur. Le fichier d'inventaire est un fichier formaté `ini` listant vos hôtes, triés par groupes, fournissant également certaines variables. Un exemple peut ressembler à ce qui suit :
 
 ```bash
 [web]
@@ -39,270 +32,145 @@ node2 ansible_host=<Y.Y.Y.Y>
 node3 ansible_host=<Z.Z.Z.Z>
 
 [control]
-ansible ansible_host=44.55.66.77
+ansible-1 ansible_host=44.55.66.77
 ```
 
-Ansible est déjà configuré pour utiliser l'inventaire spécifique à votre environnement. Nous vous montrerons à l'étape suivante comment procéder. Pour l'instant, nous allons exécuter quelques commandes simples pour comprendre l'inventaire.
-
-Pour référencer les hôtes d'inventaire, vous fournissez un modèle d'hôte à la commande ansible. Ansible a une option `--list-hosts` qui peut être utile pour clarifier quels hôtes gérés sont référencés par le modèle d'hôte dans une commande ansible.
-
-Le modèle d'hôte le plus basique est le nom d'un seul hôte géré répertorié dans le fichier d'inventaire. Cela spécifie que l'hôte sera le seul dans le fichier d'inventaire qui sera traité par la commande ansible.
-Executez:
+Pour voir votre inventaire avec ansible-navigator, utilisez la commande `ansible-navigator inventory --list -m stdout`. Cette commande affiche tous les nœuds et leurs groupes respectifs.
 
 ```bash
-[student<X@>ansible ~]$ ansible node1 --list-hosts
-  hosts (1):
-    node1
-```
-
-Un fichier d'inventaire peut contenir beaucoup plus d'informations, il peut organiser vos hôtes en groupes ou définir des variables. Dans notre exemple, l'inventaire actuel a les groupes «web» et «control». Exécutez Ansible avec ces modèles d'hôte et observez la sortie:
-
-```bash
-[student<X@>ansible ~]$ ansible web  --list-hosts
-[student<X@>ansible ~]$ ansible web,ansible --list-hosts
-[student<X@>ansible ~]$ ansible 'node*' --list-hosts
-[student<X@>ansible ~]$ ansible all --list-hosts
-```
-
-Comme vous le voyez, il est correct de placer les systèmes dans plusieurs groupes. Par exemple, un serveur peut être à la fois un serveur Web et un serveur de base de données. Notez que dans Ansible, les groupes ne sont pas nécessairement hiérarchiques.
-
-> **Astuce**
->
-> L'inventaire peut contenir plus de données. Par exemple. si vous avez des hôtes qui s'exécutent sur des ports SSH non standard, vous pouvez mettre le numéro de port après le nom d'hôte avec deux points. Ou vous pouvez définir des noms spécifiques à Ansible et les faire pointer vers la "vraie" IP ou le nom d'hôte.
-
-## Étape 2 - Les fichiers de configuration Ansible
-
-Le comportement d'Ansible peut être personnalisé en modifiant les paramètres du fichier de configuration d'Ansible (format ini). Ansible sélectionnera son fichier de configuration à partir de plusieurs emplacements possibles sur le nœud de contrôle, veuillez vous référer à la [documentation](https://docs.ansible.com/ansible/latest/reference_appendices/config.html).
-
-> **Astuce**
->
-> La pratique recommandée est de créer un fichier `ansible.cfg` dans le répertoire à partir duquel vous exécutez les commandes Ansible. Ce répertoire contiendrait également tous les fichiers utilisés par votre projet Ansible, tels que l'inventaire et les playbooks. Une autre pratique recommandée est de créer un fichier `.ansible.cfg` dans votre répertoire personnel.
-
-Dans l'environnement de laboratoire qui vous est fourni, un fichier `.ansible.cfg` a déjà été créé et rempli avec les détails nécessaires dans le répertoire personnel de votre `student<X>` sur le nœud de contrôle:
-
-```bash
-[student<X>@ansible ~]$ ls -la .ansible.cfg
--rw-r--r--. 1 student<X> student<X> 231 14. Mai 17:17 .ansible.cfg
-```
-
-Affichez le fichier de configuration:
-
-```bash
-[student<X>@ansible ~]$ cat .ansible.cfg
-[defaults]
-stdout_callback = community.general.yaml
-connection = smart
-timeout = 60
-deprecation_warnings = False
-host_key_checking = False
-retry_files_enabled = False
-inventory = /home/student<X>/lab_inventory/hosts
-```
-
-Plusieurs options de configuration sont fournis. La plupart d'entre eux ne sont pas intéressantes ici, mais assurez-vous de noter la dernière ligne: l'emplacement de l'inventaire est indiqué. C'est ainsi qu'Ansible savait dans les commandes précédentes à quelles machines se connecter.
-
-Affichez le fichier d'inventaire
-
-```bash
-[student<X>@ansible ~]$ cat /home/student<X>/lab_inventory/hosts
-[web]
-node1 ansible_host=11.22.33.44
-node2 ansible_host=22.33.44.55
-node3 ansible_host=33.44.55.66
-
-[control]
-ansible ansible_host=44.55.66.77
-```
-
-> **Astuce**
->
-> Notez que chaque étudiant a un environnement de laboratoire individuel. Les adresses IP indiquées ci-dessus ne sont qu'un exemple et les adresses IP de vos environnements individuels sont différentes. Comme pour les autres cas, remplacez **\<X\>** par votre numéro d'étudiant réel.
-
-## Étape 3 - Ping d un hôte
-
-> **Avertissement**
->
-> **N'oubliez pas d'exécuter les commandes depuis le répertoire personnel de votre utilisateur étudiant, `/home/student<X>`. C'est là que se trouve votre fichier `.ansible.cfg`, sans quoi Ansible ne saura pas quel inventaire utiliser.**
-
-Commençons par quelque chose de vraiment basique - pinger un hôte. Pour ce faire, nous utilisons le module Ansible `ping`. Le module `ping` s'assure que nos hôtes cibles sont accessible. Fondamentalement, il se connecte à l'hôte géré, y exécute un petit script et collecte les résultats. Cela garantit que l'hôte géré est accessible et qu'Ansible est capable d'exécuter correctement les commandes sur celui-ci.
-
-> **Astuce**
->
-> Considérez un module comme un outil conçu pour accomplir une tâche spécifique.
-
-Ansible doit savoir qu'il doit utiliser le module `ping`: L'option `-m` définit le module Ansible à utiliser. Les options peuvent être passées au module spécifié en utilisant l'option `-a`.
-
-```bash
-[student<X>@ansible ~]$ ansible web -m ping
-node2 | SUCCESS => {
-    "ansible_facts": {
-        "discovered_interpreter_python": "/usr/bin/python"
+[student@ansible-1 rhel_workshop]$ cd /home/student
+[student@ansible-1 ~]$ ansible-navigator inventory --list -m stdout
+{
+    "_meta": {
+        "hostvars": {
+            "ansible-1": {
+                "ansible_host": "3.236.186.92"            },
+            "node1": {
+                "ansible_host": "3.239.234.187"
+            },
+            "node2": {
+                "ansible_host": "75.101.228.151"
+            },
+            "node3": {
+                "ansible_host": "100.27.38.142"
+            }
+        }
     },
-    "changed": false,
-    "ping": "pong"
-}
-[...]
-```
-
-Comme vous le voyez, chaque nœud donne un resultat positif - ici "pong".
-
-## Étape 4 - Liste des modules et obtention d aide
-
-Ansible est livré avec de nombreux modules par défaut. Pour répertorier tous les modules exécutés:
-
-```bash
-[student<X>@ansible ~]$ ansible-doc -l
-```
-
-> **Astuce**
->
-> Dans `ansible-doc` quittez en appuyant sur le bouton `q`. Utilisez les flèches `haut`/`bas` pour faire défiler le contenu.
-
-Pour trouver un module, essayez par exemple:
-
-
-```bash
-[student<X>@ansible ~]$ ansible-doc -l | grep -i user
-```
-
-Obtenez de l'aide pour un module spécifique, y compris des exemples d'utilisation:
-
-```bash
-[student<X>@ansible ~]$ ansible-doc user
-```
-
-> **Astuce**
->
-> Les options obligatoires sont marquées d'un "=" dans `ansible-doc`.
-
-## Étape 5 - Utilisation du module commande:
-
-Voyons maintenant comment exécuter une bonne commande Linux à l'ancienne à l'aide du module `command`.
-Celui lui ci exécute simplement la commande spécifiée sur un hôte géré:
-
-```bash
-[student<X>@ansible ~]$ ansible node1 -m command -a "id"
-node1 | CHANGED | rc=0 >>
-uid=1001(student1) gid=1001(student1) Gruppen=1001(student1) Kontext=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
-```
-Dans ce cas, le module est appelé «commande» et l'option passée avec "-a" est la commande réelle à exécuter. Essayez d'exécuter cette commande Ad-hoc sur tous les hôtes gérés en utilisant le modèle d'hôte `all`.
-
-Un autre exemple: jetez un œil aux versions du noyau que vos hôtes:
-
-```bash
-[student<X>@ansible ~]$ ansible all -m command -a 'uname -r'
-```
-
-Parfois, il est souhaitable d'avoir la sortie d'un hôte sur une seule ligne:
-
-```bash
-[student<X>@ansible ~]$ ansible all -m command -a 'uname -r' -o
-```
-
-> **Astuce**
->
-> Comme de nombreuses commandes Linux, `ansible` permet des options de forme longue aussi bien que de forme courte. Par exemple, `ansible web --module-name ping` est identique à l'exécution de` ansible web -m ping`. Nous allons utiliser les options abrégées tout au long de cet atelier.
-
-## Étape 6 - Le module de copie et les autorisations
-
-En utilisant le module `copy`, exécutez une commande Ad-hoc sur `node1` pour changer le contenu du fichier `/etc/motd`. **Le contenu est remis au module via une option dans ce cas**.
-
-Exécutez ce qui suit, mais **attendez-vous à une erreur**:
-
-```bash
-[student<X>@ansible ~]$ ansible node1 -m copy -a 'content="Managed by Ansible\n" dest=/etc/motd'
-```
-
-Comme mentionné, cela produit une **erreur**:
-
-```bash
-    node1 | FAILED! => {
-        "changed": false,
-        "checksum": "a314620457effe3a1db7e02eacd2b3fe8a8badca",
-        "failed": true,
-        "msg": "Destination /etc not writable"
+    "all": {
+        "children": [
+            "control",
+            "ungrouped",
+            "web"
+        ]
+    },
+    "control": {
+        "hosts": [
+            "ansible-1"
+        ]
+    },
+    "web": {
+        "hosts": [
+            "node1",
+            "node2",
+            "node3"
+        ]
     }
+}
+
 ```
 
-La sortie de la commande Ad-hoc vous crie **FAILED** en rouge. Pourquoi? Parce que l'utilisateur **student\<X\>** n'est pas autorisé à écrire le fichier motd.
+NOTE : `-m` est l'abréviation de `--mode` qui permet de passer au mode de sortie standard au lieu d'utiliser l'interface utilisateur basée sur le texte (TUI).
 
-Maintenant, c'est un cas pour l'escalade de privilèges et la raison pour laquelle `sudo` doit être configuré correctement. Nous devons demander à Ansible d'utiliser `sudo` pour exécuter la commande en tant que root en utilisant le paramètre` -b` (pensez "become").
-
-> **Astuce**
->
-> Ansible se connectera aux machines en utilisant votre nom d'utilisateur actuel (student\<X\> dans ce cas), tout comme SSH le ferait. Pour remplacer le nom d'utilisateur distant, vous pouvez utiliser le paramètre `-u`.
-
-Pour nous, il est normal de se connecter en tant que **student<\X\>** car `sudo` est configuré. Modifiez la commande pour utiliser le paramètre `-b` et exécutez à nouveau:
+Pour une vue moins détaillée, `ansible-navigator inventory --graph -m stdout` offre une représentation visuelle des groupements.
 
 ```bash
-[student<X>@ansible ~]$ ansible node1 -m copy -a 'content="Managed by Ansible\n" dest=/etc/motd' -b
+[student@ansible-1 ~]$ ansible-navigator inventory --graph -m stdout
+@all:
+  |--@control:
+  |  |--ansible-1
+  |--@ungrouped:
+  |--@web:
+  |  |--node1
+  |  |--node2
+  |  |--node3
+
 ```
 
-Cette fois, la commande est un succès:
+Nous pouvons clairement voir que les nœuds : `node1`, `node2`, `node3` font partie du groupe `web`, tandis que `ansible-1` fait partie du groupe `control`.
 
-```
-node1 | CHANGED => {
-    "changed": true,
-    "checksum": "4458b979ede3c332f8f2128385df4ba305e58c27",
-    "dest": "/etc/motd",
-    "gid": 0,
-    "group": "root",
-    "md5sum": "65a4290ee5559756ad04e558b0e0c4e3",
-    "mode": "0644",
-    "owner": "root",
-    "secontext": "system_u:object_r:etc_t:s0",
-    "size": 19,
-    "src": "/home/student1/.ansible/tmp/ansible-tmp-1557857641.21-120920996103312/source",
-    "state": "file",
-    "uid": 0
-```
+Un fichier d'inventaire peut organiser vos hôtes en groupes ou définir des variables. Dans notre exemple, l'inventaire actuel a les groupes `web` et `control`. Exécutez `ansible-navigator` avec ces modèles d'hôtes et observez la sortie :
 
-Utilisez Ansible avec le module générique `command` pour vérifier le contenu du fichier motd:
+En utilisant la commande `ansible-navigator inventory`, vous pouvez exécuter des commandes qui fournissent des informations uniquement pour un hôte ou un groupe. Par exemple, exécutez les commandes suivantes et observez leurs différentes sorties.
 
 ```bash
-[student<X>@ansible ~]$ ansible node1 -m command -a 'cat /etc/motd'
-node1 | CHANGED | rc=0 >>
-Managed by Ansible
+[student@ansible-1 ~]$ ansible-navigator inventory --graph web -m stdout
+[student@ansible-1 ~]$ ansible-navigator inventory --graph control -m stdout
+[student@ansible-1 ~]$ ansible-navigator inventory --host node1 -m stdout
 ```
 
-
-Exécutez à nouveau la commande `ansible node1 -m copy…`. Notez:
-
-   - La couleur de sortie différente (configuration de terminal appropriée fournie).
-   - Le changement de `"changed": true,` à `" changed": false,`.
-   - La première ligne indique `SUCCESS` au lieu de `CHANGED`.  
-
-> **Astuce**
+> **Conseil**
 >
-> Cela permet de repérer plus facilement les changements et ce qu'Ansible a réellement fait.
+> L'inventaire peut contenir plus de données. Par exemple, si vous avez des hôtes qui fonctionnent sur des ports SSH non standard, vous pouvez mettre le numéro de port après le nom d'hôte avec deux points. On peut également définir des noms spécifiques à Ansible et les faire pointer vers l'IP ou le nom d'hôte.
 
-## Défi: Les modules
+### Découverte de Modules
 
-   - Utilisation de `ansible-doc`
+La Plateforme d'Automatisation Ansible est livrée avec plusieurs Environnements d'Exécution (EE) pris en charge. Ces EE sont livrés avec des collections prises en charge groupées contenant du contenu pris en charge, y compris des modules.
 
-       - Trouvez un module qui utilise Yum pour gérer les packages logiciels.
-
-       - Recherchez les exemples d'aide du module pour savoir comment installer un package dans la dernière version.
-
-   - Exécutez une commande Ad-hoc Ansible pour installer le package "squid" dans la dernière version sur `node1`.
-
-> **Astuce**
+> **Conseil**
 >
-> Utilisez la commande copier Ad-hoc ci-dessus comme modèle et modifiez le module et les options.
+> Dans `ansible-navigator`, sortez en appuyant sur le bouton `ESC`.
 
-> **Avertissement**
->
-> **Solution ci-dessous \!**
+Pour parcourir vos modules disponibles, entrez d'abord en mode interactif :
 
-```
-[student<X>@ansible ~]$ ansible-doc -l | grep -i yum
-[student<X>@ansible ~]$ ansible-doc yum
-[student<X>@ansible ~]$ ansible node1 -m yum -a 'name=squid state=latest' -b
+```bash
+$ ansible-navigator
 ```
 
-----
+![image d'ansible-navigator](images/interactive-mode.png)
+
+Parcourez une collection en tapant `:collections`
+
+```bash
+:collections
+```
+
+![image d'ansible-navigator](images/interactive-collections.png)
+
+### Accès à la Documentation des Modules
+
+Pour explorer les modules d'une collection spécifique, entrez le numéro à côté du nom de la collection.
+
+Par exemple, dans la capture d'écran ci-dessus, le numéro `0` correspond à la collection `amazon.aws`. Pour zoomer sur la collection, tapez le numéro `0`.
+
+```bash
+0
+```
+
+![image d'ansible-navigator](images/interactive-aws.png)
+
+Accédez directement à la documentation détaillée de n'importe quel module en spécifiant son numéro correspondant. Par exemple, le module `ec2_tag` correspond à `24`.
+
+```bash
+:24
+```
+
+En faisant défiler vers le bas à l'aide des touches fléchées ou de page en haut et page en bas, nous pouvons voir la documentation et les exemples.
+
+![image d'ansible-navigator](images/interactive-ec2-tag.png)
+
+Vous pouvez accéder directement à un module particulier en tapant simplement `:doc namespace.collection.module-name`. Par exemple, taper `:doc amazon.aws.ec2_tag` vous amènerait directement à la page finale montrée ci-dessus.
+
+> **Conseil**
+>
+> Différents environnements d'exécution peuvent avoir accès à différentes collections et à différentes versions de ces collections. En utilisant la documentation intégrée, vous savez qu'elle sera précise pour cette version particulière de la collection.
+
+
+---
 **Navigation**
-<br>
-[Exercise précédent](../1.1-setup/README.fr.md) - [Exercise suivant](../1.3-playbook/README.fr.md)
+{% if page.url contains 'ansible_rhel_90' %}
+[Exercice précédent](../1-setup/README.fr.md) - [Exercice suivant](../3-playbook/README.fr.md)
+{% else %}
+[Exercice précédent](../1.1-setup/README.fr.md) - [Exercice suivant](../1.3-playbook/README.fr.md)
+{% endif %}
+<br><br>
 
-[Cliquez ici pour revenir à l'atelier Ansible pour Red Hat Enterprise Linux](../README.fr.md)

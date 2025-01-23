@@ -133,7 +133,7 @@ Now you create a new Template that includes a survey.
     <td>Workshop Project</td>
   </tr>
   <tr>
-    <td>Eecution Environment</td>
+    <td>Execution Environment</td>
     <td>Default execution environment</td>
   </tr>
   <tr>
@@ -210,9 +210,7 @@ In the same fashion add a second **Survey Question**
 </table>
 
 * Click **Save**
-* Click the toggle to turn the Survey questions to **On**
-
-* Click **Preview** for the Survey
+* Click the **Survey Enabled** toggle button to turn on the Survey questions
 
 ### Launch the Template
 
